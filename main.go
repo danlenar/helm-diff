@@ -6,6 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"k8s.io/helm/pkg/helm"
+	"k8s.io/helm/pkg/helm/environment"
+	"k8s.io/helm/pkg/helm/helmpath"
 
 	"github.com/databus23/helm-diff/manifest"
 )
@@ -19,7 +21,12 @@ This can be used visualize what changes a helm upgrade will
 perform.
 `
 
-var Version string = "HEAD"
+var (
+	Version  string                  = "HEAD"
+	settings environment.EnvSettings = environment.EnvSettings{
+		Home: helmpath.Home(os.Getenv("HELM_HOME")),
+	}
+)
 
 type diffCmd struct {
 	release string
@@ -68,7 +75,7 @@ func main() {
 }
 
 func (d *diffCmd) run() error {
-	chartPath, err := locateChartPath(d.chart, "", false, "")
+	chartPath, err := locateChartPath("", d.chart, "", false, "", "", "", "")
 	if err != nil {
 		return err
 	}
